@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """Pista original alegre, estilo tropical-pop, 128 BPM.
 
-Uso: python3 make_music_alegre.py <segundos> <salida.wav>
+Uso: python3 make_music_alegre.py <segundos> <salida.wav> [bpm] [transponer]
 """
 import sys, wave
 import numpy as np
 
 DUR, OUT = float(sys.argv[1]), sys.argv[2]
-SR, BPM = 44100, 128
+SR = 44100
+BPM = float(sys.argv[3]) if len(sys.argv) > 3 else 128
+TR = int(sys.argv[4]) if len(sys.argv) > 4 else 0
 B = 60 / BPM
 N = int(SR * (DUR + 2))
 L, R = np.zeros(N), np.zeros(N)
 rng = np.random.default_rng(3)
 
-def hz(m): return 440 * 2 ** ((m - 69) / 12)
+def hz(m): return 440 * 2 ** ((m + TR - 69) / 12)
 
 def put(sig, t, gain=1.0, pan=0.0):
     i = int(t * SR); j = min(N, i + len(sig))
