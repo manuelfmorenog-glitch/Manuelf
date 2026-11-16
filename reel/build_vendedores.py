@@ -120,34 +120,42 @@ def rounded(img, r):
 
 # ---------- celular con catálogo (sin precios) ----------
 SW, SH = 440, 920
+CATDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendedores", "catalogo")
+CAT_ITEMS = [("snack", "Torta tipo Snack", "¡Nuestra más práctica!", True),
+             ("personal", "Torta Personal", "Porción individual", True),
+             ("mediana", "Torta Mediana", "Para 2-3 personas", False),
+             ("generosa", "Torta La Generosa", "Para 4-5 porciones", False),
+             ("almo6", "Almojábanas Campesinas", "Caja x6 unidades", False),
+             ("cmediana", "Combo Mediana", "Torta + 6 almojábanas", False),
+             ("cpersonal", "Combo Personal", "Galletas + torta + almojábanas", False),
+             ("gall", "Galletas Caseritas", "Hechas con amor", False)]
 def catalog_screen():
-    rows = [("torta_p", "Torta Personal", "Receta de la abuela"), ("almo", "Almojábanas del Campo", "Caja x6"),
-            ("spoon", "Torta de Cuajada", "Suave y doradita"), ("gall", "Galletas Caseritas", "Hechas con amor"),
-            ("torta_r", "Torta Mediana", "Para compartir"), ("almo_r", "Combo Familiar", "Torta + almojábanas")]
-    cw, chh = 196, 330
-    tall = Image.new("RGBA", (SW, 150 + ((len(rows) + 1) // 2) * (chh + 16) + 40), (250, 245, 236, 255))
+    """Réplica del catálogo digital de la app, SIN precios."""
+    cw, chh = 196, 318
+    tall = Image.new("RGBA", (SW, 160 + ((len(CAT_ITEMS) + 1) // 2) * (chh + 14) + 40), (250, 245, 236, 255))
     d = ImageDraw.Draw(tall)
-    tall.alpha_composite(round_logo(70), (18, 22))
+    tall.alpha_composite(round_logo(70), (18, 20))
     d.text((100, 30), "CATÁLOGO DE", font=ImageFont.truetype(F_SB, 15), fill=(180, 130, 50))
     d.text((100, 50), "Tu nombre aquí", font=ImageFont.truetype(F_PF, 26), fill=CHOC)
+    d.line((16, 100, SW - 16, 100), fill=CRM2, width=2)
     x = 16
-    for i, chip in enumerate(["Todos", "Tortas", "Combos", "Productos"]):
+    for i, chip in enumerate(["Todos", "Combos", "Productos", "Tortas"]):
         f = ImageFont.truetype(F_SB, 17); w = d.textlength(chip, font=f) + 28
-        d.rounded_rectangle((x, 104, x + w, 138), 17, fill=CHOC if i == 0 else WHT, outline=CRM2, width=2)
-        d.text((x + 14, 110), chip, font=f, fill=WHT if i == 0 else CHOC); x += w + 8
-    for i, (k, name, sub) in enumerate(rows):
-        cx, cy = 16 + (i % 2) * (cw + 16), 154 + (i // 2) * (chh + 16)
+        d.rounded_rectangle((x, 112, x + w, 146), 17, fill=CHOC if i == 0 else WHT, outline=CRM2, width=2)
+        d.text((x + 14, 118), chip, font=f, fill=WHT if i == 0 else CHOC); x += w + 8
+    for i, (k, name, sub, star) in enumerate(CAT_ITEMS):
+        cx, cy = 16 + (i % 2) * (cw + 16), 162 + (i // 2) * (chh + 14)
         card = Image.new("RGBA", (cw, chh), (0, 0, 0, 0)); cd = ImageDraw.Draw(card)
         cd.rounded_rectangle((0, 0, cw - 1, chh - 1), 18, fill=WHT, outline=CRM2, width=2)
-        ph = rounded(view(IM[k], 1.1, .5, .5, cw - 12, 170), 14); card.alpha_composite(ph, (6, 6))
-        if i < 2:
-            cd.rounded_rectangle((14, 14, 112, 40), 13, fill=GOLD); cd.text((24, 17), "★ Destacado", font=ImageFont.truetype(F_SB, 14), fill=WHT)
-        f1 = ImageFont.truetype(F_PF, 19); y = 186
-        for ln in (name if len(name) < 17 else name.replace(" del ", "\ndel ").replace("Combo ", "Combo\n")).split("\n"):
-            cd.text((12, y), ln, font=f1, fill=CHOC); y += 24
-        cd.text((12, y + 2), sub, font=ImageFont.truetype(F_SB, 14), fill=(130, 100, 70))
-        cd.rounded_rectangle((12, chh - 52, cw - 12, chh - 14), 19, fill=(196, 146, 56))
-        cd.text((cw / 2 - 38, chh - 46), "+  Agregar", font=ImageFont.truetype(F_SB, 17), fill=WHT)
+        src = IM[k] if k in IM else warm(Image.open(os.path.join(CATDIR, k + ".jpg")).convert("RGB"))
+        ph = rounded(view(src, 1.0, .5, .5, cw - 12, 168), 14); card.alpha_composite(ph, (6, 6))
+        if star:
+            cd.rounded_rectangle((14, 14, 108, 40), 13, fill=(196, 146, 56))
+            cd.text((24, 17), "Destacado", font=ImageFont.truetype(F_SB, 14), fill=WHT)
+        t1 = txt(name, F_PF, 19, CHOC, maxw=cw - 30, align="left", lh=1.1); card.alpha_composite(t1, (-12, 158))
+        t2 = txt(sub, F_SB, 13, (130, 100, 70), maxw=cw - 30, align="left"); card.alpha_composite(t2, (-12, 158 + t1.height - 40))
+        cd.rounded_rectangle((12, chh - 50, cw - 12, chh - 14), 18, fill=(196, 146, 56))
+        cd.text((cw / 2 - 40, chh - 44), "+  Agregar", font=ImageFont.truetype(F_SB, 17), fill=WHT)
         tall.alpha_composite(card, (cx, cy))
     return tall
 CATALOG = catalog_screen()
@@ -236,25 +244,66 @@ def icon(kind, s=150, col=WHT):
         for x in (c - 28, c + 32): d.ellipse((x - 15, c + 12, x + 15, c + 42), fill=col); d.ellipse((x - 6, c + 21, x + 6, c + 33), fill=TERRA)
     return img
 STEPS = [("share", "Compartir"), ("order", "Pedido"), ("prep", "Preparación"), ("deliver", "Entrega")]
+
+def banner(scr, k, title, sub, col, ic):
+    """Notificación que baja dentro de la pantalla del celular."""
+    if k <= 0: return
+    y = int(-150 + back(k, 1.4) * 210)
+    bn = Image.new("RGBA", (SW - 30, 120), (0, 0, 0, 0)); bd = ImageDraw.Draw(bn)
+    bd.rounded_rectangle((0, 0, SW - 31, 119), 26, fill=(255, 255, 255, 248), outline=CRM2, width=2)
+    bd.ellipse((16, 22, 92, 98), fill=col); bn.alpha_composite(icon(ic, 150).resize((60, 60), Image.LANCZOS), (24, 30))
+    bd.text((108, 26), title, font=ImageFont.truetype(F_XB, 24), fill=CHOC)
+    bd.text((108, 62), sub, font=ImageFont.truetype(F_SB, 18), fill=(120, 100, 80))
+    scr.alpha_composite(bn, (15, y))
+
+def share_sheet(scr, k):
+    if k <= 0: return
+    h = 330; y = int(SH - back(k, 1.2) * h)
+    sh = Image.new("RGBA", (SW, h + 40), (0, 0, 0, 0)); d = ImageDraw.Draw(sh)
+    d.rounded_rectangle((0, 0, SW - 1, h + 39), 34, fill=WHT)
+    d.rounded_rectangle((SW / 2 - 30, 12, SW / 2 + 30, 18), 3, fill=(210, 200, 190))
+    d.text((28, 34), "Comparte tu catálogo", font=ImageFont.truetype(F_XB, 24), fill=CHOC)
+    d.rounded_rectangle((28, 80, SW - 28, 130), 14, fill=(244, 238, 228))
+    d.text((44, 94), "Tu link personalizado", font=ImageFont.truetype(F_SB, 18), fill=(120, 100, 80))
+    d.rounded_rectangle((28, 150, SW - 28, 214), 32, fill=(37, 185, 95))
+    d.text((SW / 2 - 104, 166), "Compartir por WhatsApp", font=ImageFont.truetype(F_XB, 21), fill=WHT)
+    d.rounded_rectangle((28, 228, SW - 28, 290), 31, fill=WHT, outline=CRM2, width=2)
+    d.text((SW / 2 - 50, 245), "Copiar link", font=ImageFont.truetype(F_XB, 21), fill=CHOC)
+    scr.alpha_composite(Image.new("RGBA", (SW, SH), (0, 0, 0, int(90 * clamp(k)))))
+    scr.alpha_composite(sh, (0, y))
+
+def tap(scr, t, t0, x, y):
+    if not (t0 <= t <= t0 + .6): return
+    k = (t - t0) / .6; d = ImageDraw.Draw(scr); r = 18 + 40 * k
+    d.ellipse((x - r, y - r, x + r, y + r), outline=(196, 86, 44, int(255 * (1 - k))), width=6)
+    d.ellipse((x - 16, y - 16, x + 16, y + 16), fill=(196, 86, 44, int(200 * (1 - k))))
+
 def sc_simple(t):
     cv = CREAM.copy(); d = ImageDraw.Draw(cv)
-    enter(cv, txt("Sin inventarios.", F_PF, 96, CHOC), t, .1, 540, 230)
-    enter(cv, txt("Sin experiencia.", F_PF, 96, TERRA), t, .5, 540, 345)
-    # flujo de 4 pasos
-    ys = [600, 840, 1080, 1320]
+    enter(cv, txt("Sin inventarios.", F_PF, 96, CHOC), t, .1, 540, 210)
+    enter(cv, txt("Sin experiencia.", F_PF, 96, TERRA), t, .5, 540, 325)
+    T = [b(2 + 3 * i) for i in range(4)]
+    def ov(scr):
+        share_sheet(scr, (t - T[0]) / .5 if t < T[1] else 1 - (t - T[1]) / .3)
+        tap(scr, t, T[0] + 1.0, SW / 2, SH - 330 + 182)
+        if t >= T[1]: banner(scr, (t - T[1]) / .5 if t < T[2] else 1, "¡Nuevo pedido!", "Un cliente hizo su pedido", TERRA, "order")
+        if t >= T[2]: banner(scr, (t - T[2]) / .5, "En preparación", "Baruj Shefa prepara tu pedido", CHOC2, "prep") if t < T[3] else None
+        if t >= T[3]: banner(scr, (t - T[3]) / .5, "¡Pedido entregado!", "Tu cliente ya lo disfruta", GRN, "deliver")
+    put(cv, phone(.05 + .25 * eio(t / b(14)), ov), 790, 1000, .74, eo((t - .3) / .6), -3)
+    ys = [640, 860, 1080, 1300]
     for i, (ic, lab) in enumerate(STEPS):
-        t0 = b(2 + 1.6 * i)
+        t0 = T[i]
         if t > t0 and i > 0:
-            k = eo((t - t0 + .3) / .5); d.line((300, ys[i - 1] + 85, 300, ys[i - 1] + 85 + (ys[i] - ys[i - 1] - 170) * k), fill=GOLD, width=8)
+            k = eo((t - t0 + .3) / .5); d.line((150, ys[i - 1] + 72, 150, ys[i - 1] + 72 + (ys[i] - ys[i - 1] - 144) * k), fill=GOLD, width=7)
         if t < t0: continue
         k = (t - t0) / .5
-        circ = Image.new("RGBA", (190, 190), (0, 0, 0, 0)); cd = ImageDraw.Draw(circ)
-        cd.ellipse((6, 10, 186, 190), fill=(0, 0, 0, 50)); cd.ellipse((0, 0, 180, 180), fill=TERRA if i % 2 == 0 else CHOC2)
-        circ.alpha_composite(icon(ic, 150), (15, 15))
-        put(cv, circ, 300, ys[i], back(k, 2), 1)
-        enter(cv, txt(f"{i + 1}. {lab}", F_BLK, 62, CHOC, align="left"), t, t0 + .15, 420, ys[i] - 10, "left", "l")
+        circ = Image.new("RGBA", (160, 160), (0, 0, 0, 0)); cd = ImageDraw.Draw(circ)
+        cd.ellipse((5, 8, 155, 158), fill=(0, 0, 0, 50)); cd.ellipse((0, 0, 150, 150), fill=TERRA if i % 2 == 0 else CHOC2)
+        circ.alpha_composite(icon(ic, 120), (15, 15))
+        put(cv, circ, 150, ys[i], back(k, 2), 1)
+        enter(cv, txt(f"{i + 1}. {lab}", F_BLK, 50, CHOC, align="left"), t, t0 + .15, 225, ys[i] - 6, "left", "l")
     enter(cv, txt("Tú compartes tu catálogo. Tus clientes hacen sus pedidos. Nosotros nos encargamos del resto.",
-                  F_SB, 44, CHOC2, maxw=900, lh=1.3), t, b(8.6), 540, 1600)
+                  F_SB, 42, CHOC2, maxw=920, lh=1.3), t, b(14), 540, 1680)
     header(cv, t); return cv
 
 PLACES = [("Desde casa", "home"), ("En tus tiempos libres", "clock"), ("Mientras disfrutas un café", "cup")]
@@ -286,7 +335,7 @@ def sc_contigo(t):
           t, b(6.5), 540, 1700)
     header(cv, t); return cv
 
-CHECKS = ["Productos de tradición familiar", "Registro sanitario INVIMA para nuestras tortas de cuajada",
+CHECKS = ["Productos de tradición familiar", "Productos con registro sanitario INVIMA",
           "Catálogo digital personalizado", "Producción y entregas a cargo de Baruj Shefa", "Oportunidad de generar ingresos por ventas"]
 def check_row(text):
     row = Image.new("RGBA", (940, 120), (0, 0, 0, 0)); d = ImageDraw.Draw(row)
@@ -317,10 +366,13 @@ def sc_final(t):
     put(cv, LOGO_M, 870, 230, elastic((t - .5) / .9) if t > .5 else 0, 1, 8)
     enter(cv, txt("¡TU PRÓXIMA VENTA", F_BLK, 88, CHOC), t, b(1.5), 540, 1180, "up")
     enter(cv, txt("PUEDE EMPEZAR HOY!", F_BLK, 88, TERRA), t, b(2.1), 540, 1285, "up")
-    enter(cv, txt("Únete a nuestra comunidad de vendedores digitales.", F_SB, 40, CHOC2, maxw=900), t, b(2.8), 540, 1385)
+    enter(cv, txt("Únete a nuestra comunidad de vendedores digitales.", F_SB, 36, CHOC2, maxw=1000), t, b(2.8), 540, 1385)
     if t > b(3.6):
         k = (t - b(3.6)) / .5; pul = 1 + .04 * math.sin(max(0, t - b(4.6)) * 6)
         put(cv, pill("REGÍSTRATE AHORA", 54, WHT, TERRA, padx=70, border=GOLD2), 540, 1530, back(k, 2.4) * pul, 1)
+    if t > b(4.2):
+        k = (t - b(4.2)) / .5
+        put(cv, pill("¡INSCRIPCIÓN GRATIS!", 30, CHOC, GOLD2, padx=28), 860, 1462, back(k, 2.6), 1, -8)
     if t > b(4.6):
         k = eo((t - b(4.6)) / .5)
         box = Image.new("RGBA", (1000, 130), (0, 0, 0, 0)); bd = ImageDraw.Draw(box)
@@ -334,7 +386,7 @@ def wipe(prev, cur, k):
     if 0 < e < 1: ImageDraw.Draw(out).rectangle((0, y - 14, W, y), fill=GOLD)
     return out
 
-SCENES = [(10, sc_hook), (10.5, sc_oportunidad), (16, sc_simple), (13, sc_contigo), (10, sc_respaldo), (14, sc_final)]
+SCENES = [(10, sc_hook), (10.5, sc_oportunidad), (17, sc_simple), (13, sc_contigo), (10, sc_respaldo), (14, sc_final)]
 starts, acc = [], 0
 for s in SCENES: starts.append(acc); acc += s[0]
 DUR = b(acc); TR = .6
