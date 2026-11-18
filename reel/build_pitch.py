@@ -19,7 +19,8 @@ BEAT = 60 / 116
 
 def m(p): return next(os.path.join(MEDIA, f) for f in os.listdir(MEDIA) if f.startswith(p))
 P = dict(spoon=m("e6bf323c"), duo=m("a4fe69f9"), tortas=m("483610ce"), almo=m("ac03ebef"), gall=m("8ae233b1"),
-         cart=m("c47cb03b"), planta=m("14849d92"), llenando=m("3ed9ad98"), crudas=m("7891d98b"), pack=m("c80dcfa2"))
+         cart=m("c47cb03b"), planta=m("14849d92"), llenando=m("3ed9ad98"), crudas=m("7891d98b"), pack=m("c80dcfa2"),
+         almobox=m("a0cf5d80"), almobox2=m("eef727c6"), torta_p=m("09ff1f5e"))
 LOGO, OVEN_V = m("777dda90"), m("501b5a86")
 
 F_BLK = "/usr/share/fonts/opentype/inter/InterDisplay-Black.otf"
@@ -136,19 +137,19 @@ def blank():
     cv = Image.new("RGBA", (W, H), INK); grid(cv); return cv
 
 # ---------- escenas (sincronizadas con el guion) ----------
-def s1(t):  # 0.0–4.2  "Hay un negocio en Bogotá que ya está vendiendo… y está listo para crecer."
-    flashes = ["spoon", "tortas", "almo", "pack"]
-    if t < 1.6:
-        cv = dark_photo(flashes[int(t / .4) % 4], t, 1.6, 1.3, 1.2, .5, .5, 110)
+def s1(t):  # 0.0–5.6  voz 1.2–3.2 "…que ya vende" · 3.8–5.1 "y está listo para crecer"
+    flashes = ["spoon", "almobox", "tortas", "pack", "almo", "almobox2"]
+    if t < 2.4:
+        cv = dark_photo(flashes[int(t / .4) % 6], t, 2.4, 1.3, 1.2, .5, .5, 110)
     else:
-        cv = dark_photo("spoon", t - 1.6, 2.6, 1.25, 1.1, .5, .45, 165)
-    kin(cv, txt("UN NEGOCIO", F_BLK, 120, WHT), t, .25, 80, 560)
-    kin(cv, txt("QUE YA", F_BLK, 120, WHT), t, .55, 80, 700)
-    kin(cv, txt("VENDE.", F_BLK, 170, GOLD), t, .9, 80, 830, "slam")
-    kin(cv, txt("Y ESTÁ LISTO", F_BLK, 96, WHT), t, 2.4, 80, 1180)
-    kin(cv, txt("PARA CRECER.", F_BLKI, 120, GOLD), t, 2.8, 80, 1300, "slam")
-    if t > 2.8:  # flecha de crecimiento
-        d = ImageDraw.Draw(cv); k = eo((t - 2.8) / .6)
+        cv = dark_photo("spoon", t - 2.4, 3.2, 1.25, 1.1, .5, .45, 165)
+    kin(cv, txt("UN NEGOCIO", F_BLK, 120, WHT), t, 1.1, 80, 560)
+    kin(cv, txt("QUE YA", F_BLK, 120, WHT), t, 1.6, 80, 700)
+    kin(cv, txt("VENDE.", F_BLK, 170, GOLD), t, 2.4, 80, 830, "slam")
+    kin(cv, txt("Y ESTÁ LISTO", F_BLK, 96, WHT), t, 3.8, 80, 1180)
+    kin(cv, txt("PARA CRECER.", F_BLKI, 120, GOLD), t, 4.3, 80, 1300, "slam")
+    if t > 4.3:  # flecha de crecimiento
+        d = ImageDraw.Draw(cv); k = eo((t - 4.3) / .6)
         x0, y0, x1, y1 = 820, 1560, 1000, 1380; xe, ye = x0 + (x1 - x0) * k, y0 + (y1 - y0) * k
         d.line((x0, y0, xe, ye), fill=GOLD, width=14)
         if k > .9: d.polygon([(x1 + 12, y1 - 12), (x1 - 70, y1 - 5), (x1 + 5, y1 + 70)], fill=GOLD)
@@ -156,74 +157,142 @@ def s1(t):  # 0.0–4.2  "Hay un negocio en Bogotá que ya está vendiendo… y 
 
 def s2(t):  # 4.2–9.0  "Baruj Shefa: una receta campesina de más de sesenta años, convertida en marca."
     cv = blank()
-    ph = view(IM["duo"], 1.12 - .06 * eio(t / 4.8), .5, .33, W, 1000).convert("RGBA")
+    ph = view(IM["duo"], 1.12 - .06 * eio(t / 5.4), .5, .33, W, 1000).convert("RGBA")
     k = eo(t / .5); cv.alpha_composite(ph.crop((0, 0, W, int(1000 * k))), (0, 0))
     g = Image.new("RGBA", (W, 300), (0, 0, 0, 0)); gd = ImageDraw.Draw(g)
     for y in range(300): gd.line((0, y, W, y), fill=INK + (int(255 * y / 300),))
     cv.alpha_composite(g, (0, 700))
     put(cv, LOGO_M, 540, 1000, back((t - .4) / .5) if t > .4 else 0)
-    kin(cv, txt("+60", F_BLK, 210, GOLD), t, 1.1, 80, 1200, "slam")
-    kin(cv, txt("AÑOS DE RECETA", F_XB, 54, WHT), t, 1.4, 500, 1255)
-    kin(cv, txt("CAMPESINA", F_XB, 54, WHT), t, 1.6, 500, 1322)
-    kin(cv, txt("Convertida en marca.", F_PFI, 76, WHT), t, 2.6, 80, 1520)
-    kin(cv, txt("Chipaque → Bogotá · desde marzo 2026", F_SB, 36, GREY), t, 3.2, 80, 1640, "fade")
+    kin(cv, txt("+60", F_BLK, 210, GOLD), t, 1.5, 80, 1200, "slam")
+    kin(cv, txt("AÑOS DE RECETA", F_XB, 54, WHT), t, 1.8, 500, 1255)
+    kin(cv, txt("CAMPESINA", F_XB, 54, WHT), t, 2.0, 500, 1322)
+    kin(cv, txt("Convertida en marca.", F_PFI, 76, WHT), t, 3.6, 80, 1520)
+    kin(cv, txt("Chipaque → Bogotá · desde marzo 2026", F_SB, 36, GREY), t, 4.2, 80, 1640, "fade")
     return cv
 
-NUMS = [(9.0, 45.9, "M", "FACTURADOS", "en 9 meses"), (11.6, 755, "", "PEDIDOS", "únicos"), (14.0, 43, "%", "MARGEN BRUTO", "")]
-def s3(t):  # 9.0–17.0  cifras
-    T = t + 9.0
-    idx = 0 if T < 11.6 else 1 if T < 14.0 else 2
+NUMS = [(13.37, 45.9, "M", "FACTURADOS", ""), (15.71, 755, "", "PEDIDOS", "únicos"), (18.57, 43, "%", "MARGEN BRUTO", "")]
+S3_T0 = 11.0
+def s3(t):  # 11.0–22.9  voz: "En solo nueve meses" 11.5 · $45,9M 13.4 · 755 15.7 · 43% 18.6 · recursos propios 21.1
+    T = t + S3_T0
+    if T < NUMS[0][0]:
+        cv = dark_photo("tortas", t, 2.4, 1.35, 1.25, .5, .5, 195); grid(cv, 14); brand(cv, t)
+        kin(cv, txt("EN SOLO", F_BLK, 110, WHT), t, .4, 540, 700, "up", "c")
+        kin(cv, txt("9 MESES", F_BLK, 230, GOLD), t, .8, 540, 830, "slam", "c")
+        return cv
+    idx = 0 if T < NUMS[1][0] else 1 if T < NUMS[2][0] else 2
     t0, val, unit, lab, sub = NUMS[idx]; lt = T - t0
-    bgk = ["tortas", "pack", "almo"][idx]
-    cv = dark_photo(bgk, lt, 2.6, 1.3, 1.15, .5, .5, 200); grid(cv, 14); brand(cv, t)
+    bgk = ["tortas", "almobox", "almo"][idx]
+    cv = dark_photo(bgk, lt, 2.8, 1.3, 1.15, .5, .45, 200); grid(cv, 14); brand(cv, t)
     k = eo(lt / .9)
     if unit == "M": s = "$" + f"{val * k:.1f}".replace(".", ",") + "M"
     elif unit == "%": s = f"{int(round(val * k))}%"
     else: s = f"{int(round(val * k))}"
     put(cv, txt(s, F_BLK, 250 if idx != 0 else 230, WHT), 540, 820, 1 + .25 * (1 - eo(lt / .25)), 1)
-    kin(cv, txt(lab, F_XB, 64, GOLD, track=6), t, t0 - 9.0 + .2, 540, 990, "up", "c")
-    if sub: kin(cv, txt(sub, F_PFI, 56, WHT), t, t0 - 9.0 + .4, 540, 1080, "fade", "c")
-    if T > 15.6:  # sello recursos propios
-        kk = back((T - 15.6) / .4)
+    kin(cv, txt(lab, F_XB, 64, GOLD, track=6), t, t0 - S3_T0 + .2, 540, 990, "up", "c")
+    if sub: kin(cv, txt(sub, F_PFI, 56, WHT), t, t0 - S3_T0 + .4, 540, 1080, "fade", "c")
+    if T > 21.1:  # sello recursos propios
+        kk = back((T - 21.1) / .4)
         st = Image.new("RGBA", (760, 120), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
         sd.rounded_rectangle((0, 0, 759, 119), 60, outline=GOLD, width=5)
         v = txt("100% CON RECURSOS PROPIOS", F_XB, 40, GOLD); st.alpha_composite(v, ((760 - v.width) // 2, 34))
         put(cv, st, 540, 1400, kk)
-    # barra de progreso de la sección
-    d = ImageDraw.Draw(cv); d.rectangle((80, 1760, 80 + 920 * clamp(t / 8), 1766), fill=GOLD)
+    d = ImageDraw.Draw(cv); d.rectangle((80, 1760, 80 + 920 * clamp(t / 11.9), 1766), fill=GOLD)
     return cv
 
 def s4(t):  # 17.0–22.2  "Tres registros INVIMA vigentes y una planta de producción lista para escalar."
-    cv = dark_photo("planta", t, 5.2, 1.2, 1.05, .5, .5, 150); brand(cv, t)
-    if t > .2:
-        k = back((t - .2) / .5); s = Image.new("RGBA", (320, 320), (0, 0, 0, 0)); sd = ImageDraw.Draw(s)
+    cv = dark_photo("planta", t, 5.5, 1.2, 1.05, .5, .5, 150); brand(cv, t)
+    if t > .7:
+        k = back((t - .7) / .5); s = Image.new("RGBA", (320, 320), (0, 0, 0, 0)); sd = ImageDraw.Draw(s)
         sd.ellipse((0, 0, 319, 319), fill=(26, 98, 64)); sd.ellipse((14, 14, 305, 305), outline=GOLD, width=5)
         for tx, f, sz, y, col in [("3", F_BLK, 130, 40, WHT), ("REGISTROS", F_XB, 28, 190, GOLD), ("INVIMA", F_BLK, 40, 226, WHT)]:
             v = txt(tx, f, sz, col); s.alpha_composite(v, ((320 - v.width) // 2, y))
         put(cv, s, 540, 520, k)
-    kin(cv, txt("VIGENTES", F_XB, 52, GOLD, track=8), t, .8, 540, 720, "up", "c")
-    kin(cv, txt("PLANTA DE", F_BLK, 104, WHT), t, 2.0, 80, 1140)
-    kin(cv, txt("PRODUCCIÓN", F_BLK, 104, WHT), t, 2.3, 80, 1260)
-    kin(cv, txt("LISTA PARA ESCALAR.", F_BLKI, 84, GOLD), t, 2.8, 80, 1390, "slam")
+    kin(cv, txt("VIGENTES", F_XB, 52, GOLD, track=8), t, 1.2, 540, 720, "up", "c")
+    kin(cv, txt("PLANTA DE", F_BLK, 104, WHT), t, 2.6, 80, 1140)
+    kin(cv, txt("PRODUCCIÓN", F_BLK, 104, WHT), t, 2.9, 80, 1260)
+    kin(cv, txt("LISTA PARA ESCALAR.", F_BLKI, 84, GOLD), t, 3.6, 80, 1390, "slam")
+    return cv
+
+CATDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendedores", "catalogo")
+CAT = [("snack", "Torta tipo Snack"), ("almobox", "Almojábanas x6"), ("personal", "Torta Personal"), ("gall", "Galletas Caseritas"),
+       ("mediana", "Torta Mediana"), ("cmediana", "Combo Mediana"), ("generosa", "Torta La Generosa"), ("cpersonal", "Combo Personal")]
+def _catimg(k):
+    return IM[k] if k in IM else grade(Image.open(os.path.join(CATDIR, k + ".jpg")).convert("RGB"))
+def catalog_tall(sw=440):
+    cw, ch = 196, 280; tall = Image.new("RGBA", (sw, 150 + 4 * (ch + 14)), (250, 245, 236, 255)); d = ImageDraw.Draw(tall)
+    tall.alpha_composite(round_logo(64), (18, 20))
+    d.text((96, 26), "CATÁLOGO DIGITAL", font=ImageFont.truetype(F_SB, 15), fill=(180, 130, 50))
+    d.text((96, 46), "Baruj Shefa", font=ImageFont.truetype(F_PFI, 26), fill=(60, 30, 14))
+    x = 16
+    for i, chip in enumerate(["Todos", "Tortas", "Combos", "Productos"]):
+        f = ImageFont.truetype(F_SB, 16); w = d.textlength(chip, font=f) + 26
+        d.rounded_rectangle((x, 100, x + w, 132), 16, fill=(60, 30, 14) if i == 0 else (255, 255, 255), outline=(230, 216, 196), width=2)
+        d.text((x + 13, 106), chip, font=f, fill=(255, 255, 255) if i == 0 else (60, 30, 14)); x += w + 8
+    for i, (k, name) in enumerate(CAT):
+        cx, cy = 16 + (i % 2) * (cw + 16), 148 + (i // 2) * (ch + 14)
+        card = Image.new("RGBA", (cw, ch), (0, 0, 0, 0)); cd = ImageDraw.Draw(card)
+        cd.rounded_rectangle((0, 0, cw - 1, ch - 1), 16, fill=(255, 255, 255), outline=(230, 216, 196), width=2)
+        ph = view(_catimg(k), 1.0, .5, .5, cw - 12, 160).convert("RGBA")
+        mk = Image.new("L", ph.size, 0); ImageDraw.Draw(mk).rounded_rectangle((0, 0, ph.width - 1, ph.height - 1), 12, fill=255); ph.putalpha(mk)
+        card.alpha_composite(ph, (6, 6)); card.alpha_composite(txt(name, F_XB, 19, (60, 30, 14), maxw=cw - 24), (12, 176))
+        cd.rounded_rectangle((12, ch - 50, cw - 12, ch - 14), 18, fill=(196, 146, 56))
+        cd.text((cw / 2 - 40, ch - 44), "+  Agregar", font=ImageFont.truetype(F_SB, 17), fill=(255, 255, 255))
+        tall.alpha_composite(card, (cx, cy))
+    return tall
+CATALOG = catalog_tall()
+def phone(scroll):
+    sw, sh, bw = 440, 900, 18
+    ph = Image.new("RGBA", (sw + 2 * bw, sh + 2 * bw), (0, 0, 0, 0)); d = ImageDraw.Draw(ph)
+    d.rounded_rectangle((0, 0, sw + 2 * bw - 1, sh + 2 * bw - 1), 70, fill=(10, 10, 10), outline=(90, 84, 76), width=3)
+    y = int(scroll * (CATALOG.height - sh + 40))
+    scr = Image.new("RGBA", (sw, sh), (250, 245, 236, 255)); scr.alpha_composite(CATALOG.crop((0, y, sw, y + sh - 40)), (0, 40))
+    ImageDraw.Draw(scr).text((34, 10), "9:41", font=ImageFont.truetype(F_SB, 18), fill=(30, 20, 10))
+    mk = Image.new("L", (sw, sh), 0); ImageDraw.Draw(mk).rounded_rectangle((0, 0, sw - 1, sh - 1), 54, fill=255); scr.putalpha(mk)
+    ph.alpha_composite(scr, (bw, bw)); d.rounded_rectangle((sw / 2 + bw - 60, bw + 10, sw / 2 + bw + 60, bw + 38), 14, fill=(5, 5, 5))
+    return ph
+def system_card():
+    c = Image.new("RGBA", (470, 300), (0, 0, 0, 0)); d = ImageDraw.Draw(c)
+    d.rounded_rectangle((0, 0, 469, 299), 30, fill=(250, 245, 236), outline=GOLD, width=3)
+    c.alpha_composite(txt("SISTEMA DE GESTIÓN", F_XB, 24, (150, 100, 40), track=3), (28, 24))
+    for i, (lab, col) in enumerate([("Pedidos en línea", GREEN), ("Red de vendedores", BAR_HI), ("Inventario y caja", BAR)]):
+        y = 80 + i * 68; d.ellipse((28, y + 8, 56, y + 36), fill=col)
+        d.line([(35, y + 22), (41, y + 28), (50, y + 15)], fill=WHT, width=4)
+        c.alpha_composite(txt(lab, F_XB, 32, (50, 26, 12)), (72, y))
+    return c
+SYS = system_card()
+STEPS = [(1.0, "TIENDAS DE BARRIO"), (2.6, "RETAIL"), (4.4, "PRIMER LOCAL")]
+def s5a(t):  # 28.4–34.4  voz: "El siguiente paso: tiendas de barrio, retail y nuestro primer local."
+    cv = blank(); brand(cv, t)
+    kin(cv, txt("EL SIGUIENTE PASO", F_XB, 52, GOLD, track=6), t, .2, 80, 260)
+    k = eo((t - .1) / .6)
+    put(cv, phone(eio(t / 6) * .8), 290 - (1 - k) * 600, 960, .86, 1)
+    if t > 1.6: put(cv, SYS, 690, 1270, back((t - 1.6) / .5) * .82)
+    for i, (t0, lab) in enumerate(STEPS):
+        if t < t0: continue
+        kk = eo((t - t0) / .35); chip = Image.new("RGBA", (470, 110), (0, 0, 0, 0)); cd = ImageDraw.Draw(chip)
+        cd.rounded_rectangle((0, 0, 469, 109), 55, fill=GOLD if i == len(STEPS) - 1 else (255, 255, 255, 30), outline=GOLD, width=3)
+        v = txt(lab, F_BLK, 40 if len(lab) > 10 else 46, INK if i == len(STEPS) - 1 else WHT); chip.alpha_composite(v, ((470 - v.width) // 2, 30))
+        put(cv, chip, 800 + (1 - kk) * 400, 470 + 150 * i, 1, kk)
+    kin(cv, txt("TECNOLOGÍA PARA CRECER", F_BLK, 66, WHT), t, 2.4, 540, 1520, "slam", "c")
+    kin(cv, txt("Catálogo digital + sistema de gestión, listos para escalar.", F_SB, 36, GREY, maxw=900, align="center"), t, 3.0, 540, 1620, "fade", "c")
     return cv
 
 PLAN = [("TIENDA A TIENDA", "$20M", "Meses 1–3"), ("RETAIL", "$12M", "Meses 3–6"), ("LOCAL PROPIO", "$8M", "Meses 6–12")]
-def s5(t):  # 22.2–30.0  "El siguiente paso: tiendas de barrio, retail y un primer local. Un plan de 12 meses, con 48 millones."
+def s5b(t):  # 34.4–39.3  voz: "Un plan de doce meses, con cuarenta y ocho millones de pesos."
     cv = blank(); brand(cv, t)
-    kin(cv, txt("EL SIGUIENTE PASO", F_XB, 52, GOLD, track=6), t, .1, 80, 260)
+    kin(cv, txt("12 MESES · $48M", F_BLK, 104, WHT), t, .4, 540, 300, "slam", "c")
     for i, (a, amt, mm) in enumerate(PLAN):
-        t0 = .7 + 1.0 * i; y = 420 + 330 * i
+        t0 = 1.2 + .45 * i; y = 520 + 310 * i
         if t < t0: continue
         k = eo((t - t0) / .4); lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ImageDraw.Draw(lay).rounded_rectangle((80, y, 80 + max(60, 920 * k), y + 280), 30, fill=(255, 255, 255, 14), outline=(90, 80, 70), width=2)
+        ImageDraw.Draw(lay).rounded_rectangle((80, y, 80 + max(60, 920 * k), y + 270), 30, fill=(255, 255, 255, 14), outline=(90, 80, 70), width=2)
         cv.alpha_composite(lay)
         if k > .6:
-            cv.alpha_composite(txt(f"0{i + 1}", F_BLK, 60, GOLD), (120, y + 30))
-            cv.alpha_composite(txt(a, F_BLK, 54, WHT), (120, y + 115))
-            cv.alpha_composite(txt(mm, F_SB, 34, GREY), (120, y + 200))
-            v = txt(amt, F_BLK, 96, GOLD); cv.alpha_composite(v, (960 - v.width, y + 90))
-    kin(cv, txt("12 MESES · $48M", F_BLK, 100, WHT), t, 4.6, 540, 1460, "slam", "c")
-    kin(cv, txt("Del carrito a la góndola.", F_PFI, 60, GOLD), t, 5.6, 540, 1610, "fade", "c")
+            cv.alpha_composite(txt(f"0{i + 1}", F_BLK, 56, GOLD), (120, y + 26))
+            cv.alpha_composite(txt(a, F_BLK, 54, WHT), (120, y + 105))
+            cv.alpha_composite(txt(mm, F_SB, 34, GREY), (120, y + 190))
+            v = txt(amt, F_BLK, 96, GOLD); cv.alpha_composite(v, (960 - v.width, y + 85))
+    kin(cv, txt("Del carrito a la góndola.", F_PFI, 64, GOLD), t, 3.0, 540, 1520, "fade", "c")
     return cv
 
 def offer(title, lines, accent):
@@ -263,31 +332,31 @@ def s7(t):  # 37.0–42.4  "La proyección: pasar de noventa a ciento sesenta mi
     return cv
 
 def s8(t):  # 42.4–50.0  "No es una apuesta al futuro. Es subirse a un tren en movimiento. Agenda tu reunión hoy."
-    cv = dark_photo("cart", t, 7.6, 1.15, 1.05, .5, .4, 205); brand(cv, t)
+    cv = dark_photo("cart", t, 10.7, 1.15, 1.05, .5, .4, 205); brand(cv, t)
     kin(cv, txt("NO ES UNA APUESTA", F_BLK, 78, WHT), t, .1, 80, 330)
     kin(cv, txt("AL FUTURO.", F_BLK, 78, WHT), t, .4, 80, 430)
-    kin(cv, txt("Es subirse a un tren", F_PFI, 72, GOLD), t, 1.2, 80, 580)
-    kin(cv, txt("en movimiento.", F_PFI, 72, GOLD), t, 1.5, 80, 670)
-    if t > 2.6:
-        k = back((t - 2.6) / .5); pul = 1 + .03 * pulse(t)
+    kin(cv, txt("Es subirse a un tren", F_PFI, 72, GOLD), t, 2.0, 80, 580)
+    kin(cv, txt("en movimiento.", F_PFI, 72, GOLD), t, 2.4, 80, 670)
+    if t > 4.2:
+        k = back((t - 4.2) / .5); pul = 1 + .03 * pulse(t)
         btn = Image.new("RGBA", (920, 170), (0, 0, 0, 0)); bd = ImageDraw.Draw(btn)
-        bd.rounded_rectangle((0, 0, 919, 169), 85, fill=GOLD); v = txt("AGENDA TU REUNIÓN", F_BLK, 66, INK)
-        btn.alpha_composite(v, ((920 - v.width) // 2, 46)); put(cv, btn, 540, 940, k * pul)
-    kin(cv, txt("Estados financieros y proyecciones disponibles", F_SB, 36, WHT, align="center"), t, 3.2, 540, 1070, "fade", "c")
+        bd.rounded_rectangle((0, 0, 919, 169), 85, fill=GOLD); v = txt("CONVERSEMOS", F_BLK, 76, INK)
+        btn.alpha_composite(v, ((920 - v.width) // 2, 40)); put(cv, btn, 540, 940, k * pul)
+    kin(cv, txt("Estados financieros y proyecciones disponibles", F_SB, 36, WHT, align="center"), t, 4.8, 540, 1070, "fade", "c")
     rows = [("WHATSAPP", "+57 319 653 6874"), ("CORREO", "manuel@barujshefa.com"), ("WEB", "barujshefa.com")]
     for i, (a, bb) in enumerate(rows):
         r = Image.new("RGBA", (920, 110), (0, 0, 0, 0)); rd = ImageDraw.Draw(r)
         rd.rounded_rectangle((0, 0, 919, 109), 30, fill=(255, 255, 255, 18), outline=(110, 96, 80), width=2)
         r.alpha_composite(txt(a, F_XB, 26, GOLD, track=4), (34, 40)); v = txt(bb, F_BLK, 46, WHT); r.alpha_composite(v, (884 - v.width, 26))
-        kin(cv, r, t, 3.8 + .3 * i, 80, 1190 + 130 * i, "up")
+        kin(cv, r, t, 5.4 + .3 * i, 80, 1190 + 130 * i, "up")
     kin(cv, txt("Pieza informativa. No constituye oferta pública de valores. Toda inversión implica riesgos; "
                 "condiciones sujetas a contrato y debida diligencia.", F_SB, 22, GREY, maxw=900, align="center", lh=1.3),
-        t, 5.0, 540, 1640, "fade", "c")
-    kin(cv, txt("Baruj Shefa S.A.S. · NIT 901.990.427-6", F_SB, 24, GREY, align="center"), t, 5.0, 540, 1740, "fade", "c")
+        t, 6.6, 540, 1640, "fade", "c")
+    kin(cv, txt("Baruj Shefa S.A.S. · NIT 901.990.427-6", F_SB, 24, GREY, align="center"), t, 6.6, 540, 1740, "fade", "c")
     return cv
 
-SCENES = [(0.0, s1), (4.2, s2), (9.0, s3), (17.0, s4), (22.2, s5), (30.0, s6), (37.0, s7), (42.4, s8)]
-DUR = 50.0
+SCENES = [(0.0, s1), (5.6, s2), (11.0, s3), (22.9, s4), (28.4, s5a), (34.4, s5b), (39.3, s6), (45.8, s7), (51.8, s8)]
+DUR = 62.5
 
 def whip(prev, cur, k):
     e = eio(k); out = Image.new("RGB", (W, H)); out.paste(prev, (0, int(-e * H))); out.paste(cur, (0, int(H - e * H)))
@@ -298,9 +367,9 @@ AUDIO = MUSIC
 if VOICE:
     mix = os.path.join(SNAP, "mezcla.wav")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", MUSIC, "-i", VOICE, "-filter_complex",
-                    "[1:a]aresample=44100,highpass=f=80,acompressor=threshold=0.1:ratio=3,loudnorm=I=-16[v];"
+                    f"[1:a]aresample=44100,aformat=channel_layouts=stereo,highpass=f=80,acompressor=threshold=0.1:ratio=3,loudnorm=I=-16,apad=whole_dur={DUR}[v];"
                     "[v]asplit[v1][v2];[0:a]volume=0.9[mu];[mu][v1]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=400[duck];"
-                    "[duck][v2]amix=inputs=2:duration=first:weights=1 1.6[a]", "-map", "[a]", mix], check=True)
+                    f"[duck][v2]amix=inputs=2:duration=first:weights=1 1.6:normalize=0,atrim=0:{DUR},alimiter=limit=0.95[a]", "-map", "[a]", mix], check=True)
     AUDIO = mix
 
 ff = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
