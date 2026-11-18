@@ -22,6 +22,10 @@ P = dict(spoon=m("e6bf323c"), duo=m("a4fe69f9"), tortas=m("483610ce"), almo=m("a
          cart=m("c47cb03b"), planta=m("14849d92"), llenando=m("3ed9ad98"), crudas=m("7891d98b"), pack=m("c80dcfa2"),
          almobox=m("a0cf5d80"), almobox2=m("eef727c6"), torta_p=m("09ff1f5e"))
 LOGO, OVEN_V = m("777dda90"), m("501b5a86")
+AS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inversion", "assets")
+for _k, _f in [("almo_p", "almo_premium.jpg"), ("torta_p2", "torta_premium.jpg"), ("carrito", "carrito_vendedores.jpg"),
+               ("horno", "horno_dorado.jpg"), ("planta_op", "planta_horno.jpg")]: P[_k] = os.path.join(AS, _f)
+LOGO = os.path.join(AS, "logo_hd.png")
 
 F_BLK = "/usr/share/fonts/opentype/inter/InterDisplay-Black.otf"
 F_BLKI = "/usr/share/fonts/opentype/inter/InterDisplay-BlackItalic.otf"
@@ -138,7 +142,7 @@ def blank():
 
 # ---------- escenas (sincronizadas con el guion) ----------
 def s1(t):  # 0.0–5.6  voz 1.2–3.2 "…que ya vende" · 3.8–5.1 "y está listo para crecer"
-    flashes = ["spoon", "almobox", "tortas", "pack", "almo", "almobox2"]
+    flashes = ["torta_p2", "almo_p", "horno", "spoon", "almo_p", "torta_p2"]
     if t < 2.4:
         cv = dark_photo(flashes[int(t / .4) % 6], t, 2.4, 1.3, 1.2, .5, .5, 110)
     else:
@@ -175,14 +179,15 @@ S3_T0 = 11.0
 def s3(t):  # 11.0–22.9  voz: "En solo nueve meses" 11.5 · $45,9M 13.4 · 755 15.7 · 43% 18.6 · recursos propios 21.1
     T = t + S3_T0
     if T < NUMS[0][0]:
-        cv = dark_photo("tortas", t, 2.4, 1.35, 1.25, .5, .5, 195); grid(cv, 14); brand(cv, t)
+        cv = dark_photo("horno", t, 2.4, 1.2, 1.1, .5, .6, 185); grid(cv, 14); brand(cv, t)
         kin(cv, txt("EN SOLO", F_BLK, 110, WHT), t, .4, 540, 700, "up", "c")
         kin(cv, txt("9 MESES", F_BLK, 230, GOLD), t, .8, 540, 830, "slam", "c")
         return cv
     idx = 0 if T < NUMS[1][0] else 1 if T < NUMS[2][0] else 2
     t0, val, unit, lab, sub = NUMS[idx]; lt = T - t0
-    bgk = ["tortas", "almobox", "almo"][idx]
-    cv = dark_photo(bgk, lt, 2.8, 1.3, 1.15, .5, .45, 200); grid(cv, 14); brand(cv, t)
+    bgk = ["torta_p2", "almo_p", "carrito"][idx]
+    zc = [(2.1, 1.85, .3, .3), (2.0, 1.8, .25, .15), (1.3, 1.15, .5, .45)][idx]
+    cv = dark_photo(bgk, lt, 2.8, zc[0], zc[1], zc[2], zc[3], 195); grid(cv, 14); brand(cv, t)
     k = eo(lt / .9)
     if unit == "M": s = "$" + f"{val * k:.1f}".replace(".", ",") + "M"
     elif unit == "%": s = f"{int(round(val * k))}%"
@@ -200,7 +205,7 @@ def s3(t):  # 11.0–22.9  voz: "En solo nueve meses" 11.5 · $45,9M 13.4 · 755
     return cv
 
 def s4(t):  # 17.0–22.2  "Tres registros INVIMA vigentes y una planta de producción lista para escalar."
-    cv = dark_photo("planta", t, 5.5, 1.2, 1.05, .5, .5, 150); brand(cv, t)
+    cv = dark_photo("planta_op" if t > 2.4 else "planta", t, 5.5, 1.15, 1.02, .5, .45, 175); brand(cv, t)
     if t > .7:
         k = back((t - .7) / .5); s = Image.new("RGBA", (320, 320), (0, 0, 0, 0)); sd = ImageDraw.Draw(s)
         sd.ellipse((0, 0, 319, 319), fill=(26, 98, 64)); sd.ellipse((14, 14, 305, 305), outline=GOLD, width=5)
@@ -214,7 +219,7 @@ def s4(t):  # 17.0–22.2  "Tres registros INVIMA vigentes y una planta de produ
     return cv
 
 CATDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendedores", "catalogo")
-CAT = [("snack", "Torta tipo Snack"), ("almobox", "Almojábanas x6"), ("personal", "Torta Personal"), ("gall", "Galletas Caseritas"),
+CAT = [("torta_p2", "Torta Familiar"), ("almo_p", "Almojábanas x6"), ("personal", "Torta Personal"), ("gall", "Galletas Caseritas"),
        ("mediana", "Torta Mediana"), ("cmediana", "Combo Mediana"), ("generosa", "Torta La Generosa"), ("cpersonal", "Combo Personal")]
 def _catimg(k):
     return IM[k] if k in IM else grade(Image.open(os.path.join(CATDIR, k + ".jpg")).convert("RGB"))
@@ -332,7 +337,7 @@ def s7(t):  # 37.0–42.4  "La proyección: pasar de noventa a ciento sesenta mi
     return cv
 
 def s8(t):  # 42.4–50.0  "No es una apuesta al futuro. Es subirse a un tren en movimiento. Agenda tu reunión hoy."
-    cv = dark_photo("cart", t, 10.7, 1.15, 1.05, .5, .4, 205); brand(cv, t)
+    cv = dark_photo("carrito", t, 10.7, 1.12, 1.02, .5, .45, 200); brand(cv, t)
     kin(cv, txt("NO ES UNA APUESTA", F_BLK, 78, WHT), t, .1, 80, 330)
     kin(cv, txt("AL FUTURO.", F_BLK, 78, WHT), t, .4, 80, 430)
     kin(cv, txt("Es subirse a un tren", F_PFI, 72, GOLD), t, 2.0, 80, 580)
