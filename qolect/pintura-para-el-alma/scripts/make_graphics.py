@@ -86,49 +86,105 @@ def paste_logo(canvas, x, y, width):
     canvas.alpha_composite(lg, (x, y))
 
 
-def dots(draw, w, y, n, i):
+DISPLAY = "/usr/share/fonts/opentype/inter/InterDisplay-{}.otf"
+
+
+def display(size, weight="ExtraBold"):
+    return ImageFont.truetype(DISPLAY.format(weight), size)
+
+
+def rich_lines(draw, text, font, maxw):
+    """Divide en líneas; las palabras entre *asteriscos* se marcan como destacadas."""
+    out, hl = [], False
+    for para in text.split("\n"):
+        line = []
+        for raw in para.split():
+            on = raw.startswith("*")
+            closes = "*" in raw[1:] if on else "*" in raw
+            word = raw.replace("*", "")
+            mark = hl or on
+            if closes:
+                hl = False
+            elif on:
+                hl = True
+            trial = " ".join(w for w, _ in line + [(word, mark)])
+            if line and draw.textlength(trial, font=font) > maxw:
+                out.append(line)
+                line = []
+            line.append((word, mark))
+        out.append(line)
+    return out
+
+
+def rich_block(draw, x, y, text, font, maxw, color=WHITE, accent=GOLD, spacing=1.04, measure=False):
+    lines = rich_lines(draw, text, font, maxw)
+    if measure:
+        return len(lines) * int(font.size * spacing)
+    sp = draw.textlength(" ", font=font)
+    for line in lines:
+        xx = x
+        for word, mark in line:
+            draw.text((xx, y), word, font=font, fill=accent if mark else color)
+            xx += draw.textlength(word, font=font) + sp
+        y += int(font.size * spacing)
+    return y
+
+
+def pill(draw, x, y, text, font, bg=TEAL, fg=NAVY, padx=22, pady=12):
+    tw = draw.textlength(text, font=font)
+    asc, desc = font.getmetrics()
+    h = asc + desc + 2 * pady
+    draw.rounded_rectangle((x, y, x + tw + 2 * padx, y + h), radius=h // 2, fill=bg)
+    draw.text((x + padx, y + pady), text, font=font, fill=fg)
+    return y + h
+
+
+def counter(draw, w, y, i, n, m=80):
     if n <= 1:
         return
-    gap, r = 26, 6
-    x0 = w // 2 - (n - 1) * gap // 2
-    for k in range(n):
-        c = GOLD if k == i else (255, 255, 255, 110)
-        draw.ellipse((x0 + k * gap - r, y - r, x0 + k * gap + r, y + r), fill=c)
+    f = sans(26, "Medium")
+    t = f"{i + 1:02d} / {n:02d}"
+    draw.text((w - m - draw.textlength(t, font=f), y), t, font=f, fill=(255, 255, 255, 220))
+
+
+def dots(draw, w, y, n, i):  # compatibilidad
+    counter(draw, w, y - 20, i, n)
 
 
 def photo_slide(foto, kicker, title, body, size=(1080, 1350), fy=0.5, idx=0, total=1,
                 title_size=92, swipe=False, safe_bottom=0):
     w, h = size
     img = cover(Image.open(FOTOS / foto).convert("RGB"), w, h, fy).convert("RGBA")
-    img.alpha_composite(gradient(w, h, int(h * (0.38 if h < 1500 else 0.22)), max_alpha=235 if h < 1500 else 245))
-    top = gradient(w, 320 if h < 1500 else 520, 0, max_alpha=170).transpose(Image.FLIP_TOP_BOTTOM)
+    img.alpha_composite(gradient(w, h, int(h * (0.36 if h < 1500 else 0.22)), max_alpha=240))
+    top = gradient(w, 300 if h < 1500 else 520, 0, max_alpha=150).transpose(Image.FLIP_TOP_BOTTOM)
     img.alpha_composite(top, (0, 0))
     d = ImageDraw.Draw(img)
     m = 80
-    tf, bf, kf = serif(title_size), sans(36), sans(26, "SemiBold")
-    total_h = (40 if kicker else 0) + block_height(d, title, tf, w - 2 * m, 1.0) + 20 \
-        + (block_height(d, body, bf, w - 2 * m, 1.35) if body else 0)
-    y = h - safe_bottom - 120 - total_h
+    tf, bf, kf = display(title_size), sans(36), sans(24, "Bold")
+    maxw = w - 2 * m
+    kh = (kf.getmetrics()[0] + kf.getmetrics()[1] + 24 + 26) if kicker else 0
+    total_h = kh + rich_block(d, 0, 0, title, tf, maxw, measure=True) \
+        + ((22 + block_height(d, body, bf, maxw, 1.35)) if body else 0)
+    y = h - safe_bottom - 110 - total_h
     if kicker:
-        d.text((m, y), kicker.upper(), font=kf, fill=GOLD)
-        y += 40
-    y = text_block(d, m, y, title, tf, WHITE, w - 2 * m, 1.0) + 20
+        y = pill(d, m, y, kicker.upper(), kf) + 26
+    y = rich_block(d, m, y, title, tf, maxw)
     if body:
-        text_block(d, m, y, body, bf, MUTED, w - 2 * m, 1.35)
-    paste_logo(img, m, 70 if safe_bottom == 0 else 230, 210)
+        text_block(d, m, y + 22, body, bf, (226, 232, 240), maxw, 1.35)
+    ty = 70 if safe_bottom == 0 else 230
+    paste_logo(img, m, ty, 200)
+    counter(d, w, ty + 14, idx, total, m)
     if swipe:
-        sf = sans(28, "Medium")
-        t = "Desliza  →"
-        d.text((w - m - d.textlength(t, font=sf), 92 if safe_bottom == 0 else 252), t, font=sf, fill=WHITE)
-    dots(d, w, h - 60, total, idx)
+        sf = sans(28, "SemiBold")
+        t = "Desliza →"
+        d.text((w - m - d.textlength(t, font=sf), h - safe_bottom - 72), t, font=sf, fill=GOLD)
     return img.convert("RGB")
 
 
 def text_slide(kicker, title, lines, footer=None, size=(1080, 1350), idx=0, total=1,
-               title_size=96, safe_top=0, safe_bottom=0):
+               title_size=96, safe_top=0, safe_bottom=0, button=None):
     w, h = size
     img = Image.new("RGBA", size, NAVY + (255,))
-    # degradado de marca diagonal suave
     g = Image.new("RGBA", size)
     gd = ImageDraw.Draw(g)
     for y in range(h):
@@ -136,34 +192,48 @@ def text_slide(kicker, title, lines, footer=None, size=(1080, 1350), idx=0, tota
         c = tuple(int(NAVY[i] * (1 - t) + PETROL[i] * t) for i in range(3))
         gd.line([(0, y), (w, y)], fill=c + (255,))
     img.alpha_composite(g)
+    # círculo decorativo de marca
+    deco = Image.new("RGBA", size, (0, 0, 0, 0))
+    ImageDraw.Draw(deco).ellipse((w - 420, h - 620 - safe_bottom, w + 380, h + 180 - safe_bottom),
+                                 outline=TEAL + (60,), width=3)
+    img.alpha_composite(deco)
     d = ImageDraw.Draw(img)
     m = 90
-    paste_logo(img, m, 80 + safe_top, 260)
-    tf, lf, kf = serif(title_size), sans(38 if h < 1500 else 48), sans(26 if h < 1500 else 32, "SemiBold")
-    y = 330 + safe_top
+    maxw = w - 2 * m
+    paste_logo(img, m, 80 + safe_top, 250)
+    counter(d, w, 96 + safe_top, idx, total, m)
+    tf = display(title_size)
+    lf = sans(38 if h < 1500 else 46)
+    kf = sans(24 if h < 1500 else 30, "Bold")
+    y = 300 + safe_top
     if kicker:
-        d.text((m, y), kicker.upper(), font=kf, fill=GOLD)
-        y += 50
-    y = text_block(d, m, y, title, tf, WHITE, w - 2 * m, 1.02) + 30
-    d.line([(m, y), (m + 120, y)], fill=TEAL, width=5)
-    y += 50
+        y = pill(d, m, y, kicker.upper(), kf) + 34
+    y = rich_block(d, m, y, title, tf, maxw) + 36
     for ln in lines:
         if ln.startswith("•"):
-            d.ellipse((m, y + 16, m + 12, y + 28), fill=TEAL)
-            y = text_block(d, m + 34, y, ln[1:].strip(), lf, WHITE, w - 2 * m - 34, 1.35) + 18
-        elif ln.startswith("#"):  # cifra destacada
+            d.rounded_rectangle((m, y + 14, m + 14, y + 28), radius=4, fill=GOLD)
+            y = text_block(d, m + 36, y, ln[1:].strip(), lf, WHITE, maxw - 36, 1.35) + 18
+        elif ln.startswith("#"):
             num, _, rest = ln[1:].partition("|")
-            nf = serif(120, "Bold")
-            d.text((m, y), num, font=nf, fill=GOLD, features=["lnum"])
-            y += 125
-            y = text_block(d, m, y, rest, lf, MUTED, w - 2 * m, 1.35) + 30
+            nf = display(130, "Black")
+            d.text((m, y), num, font=nf, fill=GOLD)
+            y += 140
+            y = text_block(d, m, y, rest, lf, (203, 213, 225), maxw, 1.35) + 34
         else:
-            y = text_block(d, m, y, ln, lf, MUTED, w - 2 * m, 1.35) + 18
+            y = text_block(d, m, y, ln, lf, (203, 213, 225), maxw, 1.35) + 18
+    by = h - 150 - safe_bottom
     if footer:
-        ff = sans(32, "SemiBold")
-        fy = h - 170 - safe_bottom - block_height(d, footer, ff, w - 2 * m, 1.4)
-        text_block(d, m, fy, footer, ff, TEAL, w - 2 * m, 1.4)
-    dots(d, w, h - 60, total, idx)
+        ff = sans(32 if h < 1500 else 38, "Medium")
+        fh = block_height(d, footer, ff, maxw, 1.4)
+        text_block(d, m, by - fh, footer, ff, (226, 232, 240), maxw, 1.4)
+        by -= fh + 30
+    if button:
+        bf = sans(36 if h < 1500 else 44, "Bold")
+        asc, desc = bf.getmetrics()
+        bh = asc + desc + 44
+        tw = d.textlength(button, font=bf)
+        d.rounded_rectangle((m, by - bh, m + tw + 80, by), radius=bh // 2, fill=GOLD)
+        d.text((m + 40, by - bh + 22), button, font=bf, fill=NAVY)
     return img.convert("RGB")
 
 
@@ -177,78 +247,79 @@ def save_set(name, slides):
     print(name, len(slides))
 
 
-CTA_FOOTER = "WhatsApp 300 471 1065\nqolect.co"
 
 
 def main():
+    CTA = dict(button="Escríbenos por WhatsApp", footer="300 471 1065 · qolect.co")
 
     # ---------- Carrusel 1: Así se vivió ----------
     c1 = [
-        ("foto-05.jpg", 0.55, "Pintura para el Alma · Jardín Botánico", "Así se vivió",
+        ("foto-05.jpg", 0.55, "Jardín Botánico · Bogotá", "Así se vivió\n*Pintura para\nel Alma*",
          "Una tarde para pintar, respirar y reconectar."),
-        ("foto-09.jpg", 0.6, "El lugar", "Un domo rodeado de naturaleza",
-         "El Jardín Botánico de Bogotá fue nuestro refugio para bajar el ritmo."),
-        ("foto-10.jpg", 0.55, "Primero, conectar", "Respirar antes de pintar",
+        ("foto-09.jpg", 0.6, "El lugar", "Un domo rodeado de *naturaleza*",
+         "El Jardín Botánico fue nuestro refugio para bajar el ritmo."),
+        ("foto-10.jpg", 0.55, "Primero", "*Respirar*\nantes de pintar",
          "Hicimos una pausa juntos para dejar la mente quieta."),
-        ("foto-14.jpg", 0.6, "El proceso", "Pintar con el alma",
+        ("foto-14.jpg", 0.6, "El proceso", "Pintar con el *alma*",
          "Cada color, guiado por el Mapa de la Consciencia."),
-        ("foto-12.jpg", 0.5, "Sin experiencia, sin presión", "Acompañados en cada trazo",
+        ("foto-12.jpg", 0.5, "Sin experiencia", "Acompañados en *cada trazo*",
          "Un guía nos llevó paso a paso de principio a fin."),
-        ("foto-11.jpg", 0.5, "Compartir la mesa", "Almuerzo, postre y buena conversación", ""),
-        ("foto-01.jpg", 0.45, "El final", "Cada lienzo, una historia",
+        ("foto-11.jpg", 0.5, "Compartir", "Almuerzo, postre y *buena conversación*", ""),
+        ("foto-01.jpg", 0.45, "El final", "Cada lienzo,\n*una historia*",
          "Nos fuimos con una obra propia y el alma más liviana."),
     ]
     n1 = len(c1) + 1
     slides = [photo_slide(f, k, t, b, fy=fy, idx=i, total=n1, swipe=(i == 0),
-                          title_size=110 if i == 0 else 88)
+                          title_size=104 if i == 0 else 90)
               for i, (f, fy, k, t, b) in enumerate(c1)]
-    slides.append(text_slide("¿Te lo perdiste?", "Vuelve pronto.\nTe guardamos un lugar.",
+    slides.append(text_slide("¿Te lo perdiste?", "Vuelve pronto.\nTe guardamos\n*un lugar.*",
                              ["Escríbenos y te avisamos primero de la próxima edición.",
                               "Explora. Siente. Despierta."],
-                             footer=CTA_FOOTER, idx=n1 - 1, total=n1))
+                             idx=n1 - 1, total=n1, title_size=100, **CTA))
     save_set("carrusel-1-asi-se-vivio", slides)
 
     # ---------- Carrusel 2: Qué incluye ----------
     c2 = [
-        ("foto-02.jpg", 0.5, "Experiencias Qolect", "¿Qué incluye Pintura para el Alma?", ""),
-        ("foto-09.jpg", 0.6, "01", "Un lugar que inspira", "El domo del Jardín Botánico de Bogotá."),
-        ("foto-07.jpg", 0.75, "02", "Tu kit de arte", "Lienzo numerado, pinturas, pinceles y la guía del Mapa de la Consciencia."),
-        ("foto-10.jpg", 0.55, "03", "Guía y meditación", "Un facilitador te acompaña. No necesitas saber pintar."),
-        ("foto-08.jpg", 0.5, "04", "Almuerzo y postre", "Comida, hidratación y torta de cuajada artesanal de Baruj Shefa."),
-        ("foto-03.jpg", 0.45, "05", "Tu obra para llevar", "Te vas con tu lienzo y con una comunidad nueva."),
+        ("foto-02.jpg", 0.5, "Experiencias Qolect", "¿Qué incluye\n*Pintura para\nel Alma?*", ""),
+        ("foto-09.jpg", 0.6, "01 · El lugar", "Un espacio\nque *inspira*", "El domo del Jardín Botánico de Bogotá."),
+        ("foto-07.jpg", 0.75, "02 · Materiales", "Tu *kit de arte*", "Lienzo numerado, pinturas, pinceles y la guía del Mapa de la Consciencia."),
+        ("foto-10.jpg", 0.55, "03 · Acompañamiento", "Guía y *meditación*", "Un facilitador te acompaña. No necesitas saber pintar."),
+        ("foto-08.jpg", 0.5, "04 · Alimentación", "Almuerzo y *postre*", "Comida, hidratación y torta de cuajada artesanal de Baruj Shefa."),
+        ("foto-03.jpg", 0.45, "05 · El recuerdo", "Tu obra *para llevar*", "Te vas con tu lienzo y con una comunidad nueva."),
     ]
     n2 = len(c2) + 1
     slides = [photo_slide(f, k, t, b, fy=fy, idx=i, total=n2, swipe=(i == 0),
-                          title_size=100 if i == 0 else 92)
+                          title_size=100 if i == 0 else 96)
               for i, (f, fy, k, t, b) in enumerate(c2)]
-    slides.append(text_slide("Todo en un solo plan", "Desde $169.900",
-                             ["• Precio cerrado, sin sorpresas", "• Cupos limitados",
-                              "• Reserva en línea o con un asesor"],
-                             footer=CTA_FOOTER, idx=n2 - 1, total=n2, title_size=120))
+    slides.append(text_slide("Próxima edición", "¿Quieres *vivirla?*",
+                             ["Escríbenos y te avisamos primero de la próxima edición.",
+                              "Explora. Siente. Despierta."],
+                             idx=n2 - 1, total=n2, title_size=110, **CTA))
     save_set("carrusel-2-que-incluye", slides)
 
     # ---------- Carrusel 3: Empresas (B2B, también para LinkedIn) ----------
     n3 = 6
     slides = [
-        photo_slide("foto-10.jpg", "Qolect Empresas", "¿Y si el bienestar de tu equipo se viviera así?", "",
-                    fy=0.55, idx=0, total=n3, swipe=True, title_size=96),
-        photo_slide("foto-14.jpg", "Bienestar real", "Una pausa que se siente",
+        photo_slide("foto-10.jpg", "Qolect Empresas", "¿Y si el bienestar\nde tu equipo se\n*viviera así?*", "",
+                    fy=0.55, idx=0, total=n3, swipe=True, title_size=94),
+        photo_slide("foto-14.jpg", "Bienestar real", "Una pausa\nque *se siente*",
                     "Arte y meditación para bajar el estrés y unir equipos, sin necesitar experiencia previa.",
                     fy=0.6, idx=1, total=n3),
-        photo_slide("foto-11.jpg", "Nosotros ponemos todo", "Tú solo llegas",
+        photo_slide("foto-11.jpg", "Nosotros ponemos todo", "Tú *solo llegas*",
                     "Lugar, materiales, guía, alimentación y logística completa.",
                     fy=0.5, idx=2, total=n3),
-        text_slide("Ya confían en Qolect", "Un beneficio que tu equipo sí usa",
+        text_slide("Ya confían en Qolect", "Un beneficio que tu equipo *sí usa*",
                    ["#+3.980|empleados con el beneficio Qolect activo",
                     "#10+|experiencias diseñadas y operadas por nosotros"],
-                   footer="Convenios activos: Linde Praxair Colombia · Fonprax", idx=3, total=n3, title_size=80),
-        photo_slide("foto-04.jpg", "Convenios a tu medida", "Grupos desde 10 personas",
+                   footer="Convenios activos: Linde Praxair Colombia · Fonprax", idx=3, total=n3, title_size=78),
+        photo_slide("foto-04.jpg", "Convenios a tu medida", "Grupos desde\n*10 personas*",
                     "Cotización en 24 horas, portal con la marca de tu empresa y tarifas preferenciales.",
                     fy=0.45, idx=4, total=n3),
-        text_slide("Hablemos", "Lleva esta experiencia a tu empresa",
+        text_slide("Hablemos", "Lleva esta\nexperiencia a\n*tu empresa*",
                    ["• Team building y días de bienestar", "• Viajes de incentivo",
                     "• Convenios para fondos de empleados"],
-                   footer="qolect.co/empresas\nreservas@qolect.co", idx=5, total=n3, title_size=90),
+                   button="Agenda una llamada", footer="qolect.co/empresas · reservas@qolect.co",
+                   idx=5, total=n3, title_size=86),
     ]
     save_set("carrusel-3-empresas", slides)
 
@@ -256,23 +327,22 @@ def main():
     S = (1080, 1920)
     SAFE_T, SAFE_B = 160, 300
     stories = [
-        photo_slide("foto-05.jpg", "Pintura para el Alma", "¡Gracias por vivirlo con nosotros!",
+        photo_slide("foto-05.jpg", "Pintura para el Alma", "¡Gracias por\nvivirlo *con\nnosotros!*",
                     "Así se vio nuestra tarde en el Jardín Botánico.", size=S, fy=0.5,
                     title_size=100, safe_bottom=SAFE_B),
-        photo_slide("foto-01.jpg", "Cuéntanos", "¿Qué te llevaste de esta tarde?",
-                    "", size=S, fy=0.35, title_size=96, safe_bottom=SAFE_B + 120),
-        photo_slide("foto-12.jpg", "Encuesta", "¿Repetirías la experiencia?",
-                    "", size=S, fy=0.4, title_size=96,
-                    safe_bottom=SAFE_B + 120),
-        photo_slide("foto-08.jpg", "Detalles que importan", "Lo dulce también fue parte del plan",
+        photo_slide("foto-01.jpg", "Cuéntanos", "¿Qué te llevaste de *esta tarde?*",
+                    "", size=S, fy=0.35, title_size=100, safe_bottom=SAFE_B + 120),
+        photo_slide("foto-12.jpg", "Encuesta", "¿Repetirías la *experiencia?*",
+                    "", size=S, fy=0.4, title_size=100, safe_bottom=SAFE_B + 120),
+        photo_slide("foto-08.jpg", "Detalles que importan", "Lo dulce también fue *parte del plan*",
                     "Torta de cuajada artesanal de Baruj Shefa.", size=S, fy=0.5,
-                    title_size=92, safe_bottom=SAFE_B),
-        photo_slide("foto-13.jpg", "Pintar con el alma", "Un momento para ti",
-                    "Sin pantallas, sin prisa. Solo color y calma.", size=S, fy=0.5,
                     title_size=96, safe_bottom=SAFE_B),
-        text_slide("Próxima edición", "¿Quieres vivirla?",
+        photo_slide("foto-13.jpg", "Pintar con el alma", "Un momento\n*para ti*",
+                    "Sin pantallas, sin prisa. Solo color y calma.", size=S, fy=0.5,
+                    title_size=100, safe_bottom=SAFE_B),
+        text_slide("Próxima edición", "¿Quieres *vivirla?*",
                    ["Toca el enlace y escríbenos por WhatsApp.", "Te avisamos primero."],
-                   footer="qolect.co", size=S, title_size=120, safe_top=SAFE_T, safe_bottom=SAFE_B),
+                   footer="qolect.co", size=S, title_size=130, safe_top=SAFE_T, safe_bottom=SAFE_B + 200),
     ]
     save_set("historias", stories)
 

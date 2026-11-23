@@ -65,9 +65,9 @@ Después del 4-dic: crear la historia destacada **"Pintura para el Alma"** con H
 > #Qolect #PinturaParaElAlma #Testimonio #Bienestar #SaludEmocional #Bogota
 
 ### Carrusel 2: Qué incluye (lun 30-nov)
-> ¿Qué incluye Pintura para el Alma? Todo. 🎨
-> Lugar, kit de arte, guía, meditación, almuerzo, postre y tu obra para llevar. Precio cerrado y cupos limitados.
-> Reserva en qolect.co o por WhatsApp 300 471 1065.
+> ¿Qué incluye Pintura para el Alma? 🎨
+> Lugar, kit de arte, guía, meditación, almuerzo, postre y tu obra para llevar.
+> ¿Quieres vivir la próxima edición? Escríbenos por WhatsApp al 300 471 1065.
 > Guarda este post para cuando necesites un plan distinto 📌
 >
 > #Qolect #ExperienciasQolect #PlanesEnBogota #Bienestar #RegaloDiferente
@@ -102,7 +102,6 @@ Después del 4-dic: crear la historia destacada **"Pintura para el Alma"** con H
 
 ## Antes de publicar (checklist)
 - [ ] **Autorización de imagen:** confirmar que las personas que aparecen, sobre todo las de los testimonios, aceptan salir en redes.
-- [ ] Confirmar que el precio **"Desde $169.900"** (tomado de qolect.co) aplica para la próxima edición.
 - [ ] Etiquetar al Jardín Botánico de Bogotá y a Baruj Shefa con sus cuentas oficiales.
 - [ ] Reel 1: agregar la música en la app (ver nota arriba).
 
