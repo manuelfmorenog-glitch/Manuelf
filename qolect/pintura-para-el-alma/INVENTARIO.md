@@ -14,6 +14,11 @@ Jornada realizada en el domo del Jardín Botánico de Bogotá (material recibido
 | foto-07.jpg | Mesa con la hoja "Mapa de la consciencia · Pintura para el Alma", lienzo por números, agua, torta y banner de Qolect al fondo | Detalle, "qué incluye" |
 | foto-08.jpg | Mano sosteniendo la torta de cuajada Baruj Shefa con el banner de Qolect desenfocado | Detalle de catering o aliado |
 | foto-09.jpg | Gran angular del domo con todos pintando en las mesas y el banner de Qolect | Plano héroe del proceso |
+| foto-10.jpg | Círculo de pie: el facilitador guía al grupo bajo el domo, con luz de sol en el piso | Momento de conexión o meditación |
+| foto-11.jpg | Almuerzo compartido en la mesa con el banner "Qolect · Colección de experiencias · Explora. Siente. Despierta" | "Todo incluido", comunidad |
+| foto-12.jpg | Facilitador explicando; en primer plano, un lienzo a medio pintar | Proceso, aprendizaje |
+| foto-13.jpg | Participantes sentadas en silencio con su lienzo; banner al fondo | Introspección |
+| foto-14.jpg | Mesa larga, participantes con la mano en el pecho y lienzos en progreso | Meditación, "pintar con el alma" |
 
 ## Videos (`raw/videos/`), verticales, con audio
 | Archivo | Duración | Resolución | Contenido |
