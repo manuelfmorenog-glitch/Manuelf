@@ -10,6 +10,10 @@ Jornada realizada en el domo del Jardín Botánico de Bogotá (material recibido
 | foto-03.jpg | Facilitador con el brazo en alto presentando la obra de una participante | Momento de celebración |
 | foto-04.jpg | Facilitador señalando las obras; participantes sonrientes con sus lienzos | Comunidad, cierre |
 | foto-05.jpg | Gran angular del domo: el grupo muestra los lienzos, se ve el banner de Qolect | Plano héroe para reel o carrusel |
+| foto-06.jpg | Participante (hombre) de pie leyendo la hoja guía de colores | Retrato, introspección |
+| foto-07.jpg | Mesa con la hoja "Mapa de la consciencia · Pintura para el Alma", lienzo por números, agua, torta y banner de Qolect al fondo | Detalle, "qué incluye" |
+| foto-08.jpg | Mano sosteniendo la torta de cuajada Baruj Shefa con el banner de Qolect desenfocado | Detalle de catering o aliado |
+| foto-09.jpg | Gran angular del domo con todos pintando en las mesas y el banner de Qolect | Plano héroe del proceso |
 
 ## Videos (`raw/videos/`), verticales, con audio
 | Archivo | Duración | Resolución | Contenido |
@@ -24,7 +28,7 @@ Jornada realizada en el domo del Jardín Botánico de Bogotá (material recibido
 | 15.24.17 | 10,4 s | vertical | Detalle de mesa: hoja guía "Pintura para el Alma", pinturas y participantes (B-roll de detalle) |
 
 ## Fotos enviadas a mitad de conversación (pendientes de archivo)
-Se vieron en el chat pero no llegaron como archivo, así que **aún no están en el repo**: hombre leyendo la hoja guía; mesa con la hoja "Mapa de la consciencia" y el banner; torta de cuajada Baruj Shefa; plano general con todos pintando; círculo de pie con el facilitador; almuerzo con el banner "Explora. Siente. Despierta"; facilitador explicando con un lienzo en primer plano; participantes sentadas con el lienzo; mujer caminando hacia el banner (x2); mesa con el banner; participantes levantando la mano.
+Se vieron en el chat pero no llegaron como archivo, así que **aún no están en el repo** (las 4 primeras ya se recibieron como foto-06 a foto-09): círculo de pie con el facilitador; almuerzo con el banner "Explora. Siente. Despierta"; facilitador explicando con un lienzo en primer plano; participantes sentadas con el lienzo; mujer caminando hacia el banner (x2); mesa con el banner; participantes levantando la mano.
 
 Datos de marca vistos en el banner: "QOLECT · Colección de experiencias · Explora. Siente. Despierta" · "Todo lo que necesitas, en un solo lugar" · "Beneficios exclusivos por ser Qolect" · "Tu próxima aventura comienza aquí".
 
