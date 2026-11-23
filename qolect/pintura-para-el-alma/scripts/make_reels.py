@@ -36,8 +36,8 @@ def text_overlay(path, kicker, title, y_end=1380, title_size=96, top=False):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     m = 80
-    tf, kf = g.serif(title_size), g.sans(30, "SemiBold")
-    th = g.block_height(d, title, tf, W - 2 * m - 60, 1.02)
+    tf, kf = g.display(title_size), g.sans(30, "Bold")
+    th = g.rich_block(d, 0, 0, title, tf, W - 2 * m - 60, measure=True)
     block = (50 if kicker else 0) + th
     y0 = 260 if top else y_end - block
     # banda oscura suave detrás del texto
@@ -50,9 +50,8 @@ def text_overlay(path, kicker, title, y_end=1380, title_size=96, top=False):
     img.alpha_composite(band, (0, max(0, y0 - 130)))
     y = y0
     if kicker:
-        d.text((m, y), kicker.upper(), font=kf, fill=g.GOLD)
-        y += 50
-    g.text_block(d, m, y, title, tf, g.WHITE, W - 2 * m - 60, 1.02)
+        y = g.pill(d, m, y - 10, kicker.upper(), kf) + 18
+    g.rich_block(d, m, y, title, tf, W - 2 * m - 60)
     img.save(path)
     return path
 
@@ -109,9 +108,9 @@ def seg_photo(out, foto, dur, overlay=None, fy=0.5, zoom_in=True):
 
 def seg_endcard(out, dur=3.5):
     card = TMP / "endcard.jpg"
-    g.text_slide("¿Te lo perdiste?", "Vuelve pronto.\nTe guardamos un lugar.",
+    g.text_slide("¿Te lo perdiste?", "Vuelve pronto.\nTe guardamos\n*un lugar.*",
                  ["Escríbenos y te avisamos primero de la próxima edición.", "Explora. Siente. Despierta."],
-                 footer="WhatsApp 300 471 1065\nqolect.co", size=(W, H), title_size=110,
+                 button="Escríbenos por WhatsApp", footer="300 471 1065 · qolect.co", size=(W, H), title_size=110,
                  safe_top=160, safe_bottom=380).save(card, quality=95)
     frames = int(dur * FPS)
     run(["-loop", "1", "-t", str(dur), "-i", str(card), "-f", "lavfi", "-t", str(dur),
@@ -228,6 +227,7 @@ def reel_resumen():
         seg_photo(TMP / "r1_05.mp4", "foto-12.jpg", 2.4, overlay=t("05", "Sin experiencia", "Guiados paso a paso"), fy=0.5),
         seg_video(TMP / "r1_06.mp4", v("15.24.06"), 0.5, 3.0, overlay=t("06", "", "Sin prisa. Sin pantallas.")),
         seg_photo(TMP / "r1_07.mp4", "foto-11.jpg", 2.4, overlay=t("07", "", "Compartir la mesa"), fy=0.5, zoom_in=False),
+        seg_photo(TMP / "r1_07b.mp4", "foto-08.jpg", 2.4, overlay=t("07b", "", "Un delicioso *snack*"), fy=0.5),
         seg_photo(TMP / "r1_08.mp4", "foto-03.jpg", 2.2, overlay=t("08", "", "Cada lienzo,"), fy=0.45),
         seg_photo(TMP / "r1_09.mp4", "foto-01.jpg", 2.6, overlay=t("09", "", "una historia."), fy=0.45),
         seg_endcard(TMP / "r1_10.mp4"),

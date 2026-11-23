@@ -29,7 +29,7 @@ Durante 2 semanas convertimos la jornada en **prueba social**: lo que vivieron l
 Después del 4-dic: crear la historia destacada **"Pintura para el Alma"** con H1–H6. El Reel 2 sirve como anuncio pagado para la próxima edición.
 
 ## Archivos (en `contenido/`)
-- `reels/reel-1-asi-se-vivio.mp4`: 32 s. Abre el anfitrión: *"Y esto fue lo que vivimos en Pintura para el Alma"*. Después vienen escenas con texto y la tarjeta de cierre.
+- `reels/reel-1-asi-se-vivio.mp4`: 34 s. Abre el anfitrión: *"Y esto fue lo que vivimos en Pintura para el Alma"*. Después vienen escenas con texto y la tarjeta de cierre.
 - `reels/reel-2-testimonio-inversion-para-el-alma.mp4`: 57 s, con subtítulos incrustados.
 - `reels/reel-3-reconectar-contigo.mp4`: 43 s, con subtítulos incrustados.
 - `carrusel-1-asi-se-vivio/`: 8 láminas de 1080×1350.
