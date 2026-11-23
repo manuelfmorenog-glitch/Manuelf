@@ -19,6 +19,14 @@ Jornada realizada en el domo del Jardín Botánico de Bogotá (material recibido
 | 15.21.54 | 39,1 s | 464×832 | Entrevista: el anfitrión de Qolect con dos participantes frente al banner de Qolect |
 | 15.22.28 | 34,3 s | 464×832 | Entrevista o testimonio de una participante frente al banner |
 | 15.22.51 | 18,9 s | 464×832 | Continuación del testimonio de la misma participante |
+| 15.22.59 | 6,3 s | 464×832 | El anfitrión de Qolect hablando a cámara afuera del domo con micrófono y chaqueta de Qolect (posible intro o hook) |
+| 15.24.06 | 7,9 s | vertical | Paneo del domo con el grupo en mesas (B-roll) |
+| 15.24.17 | 10,4 s | vertical | Detalle de mesa: hoja guía "Pintura para el Alma", pinturas y participantes (B-roll de detalle) |
+
+## Fotos enviadas a mitad de conversación (pendientes de archivo)
+Se vieron en el chat pero no llegaron como archivo, así que **aún no están en el repo**: hombre leyendo la hoja guía; mesa con la hoja "Mapa de la consciencia" y el banner; torta de cuajada Baruj Shefa; plano general con todos pintando; círculo de pie con el facilitador; almuerzo con el banner "Explora. Siente. Despierta"; facilitador explicando con un lienzo en primer plano; participantes sentadas con el lienzo; mujer caminando hacia el banner (x2); mesa con el banner; participantes levantando la mano.
+
+Datos de marca vistos en el banner: "QOLECT · Colección de experiencias · Explora. Siente. Despierta" · "Todo lo que necesitas, en un solo lugar" · "Beneficios exclusivos por ser Qolect" · "Tu próxima aventura comienza aquí".
 
 ## Pendiente
 - Esperando más fotos y videos del usuario antes de diseñar el plan de contenidos (reels, carruseles, historias y cronograma).
