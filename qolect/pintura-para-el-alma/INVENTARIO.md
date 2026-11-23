@@ -33,7 +33,7 @@ Jornada realizada en el domo del Jardín Botánico de Bogotá (material recibido
 | 15.24.17 | 10,4 s | vertical | Detalle de mesa: hoja guía "Pintura para el Alma", pinturas y participantes (B-roll de detalle) |
 
 ## Fotos enviadas a mitad de conversación (pendientes de archivo)
-Se vieron en el chat pero no llegaron como archivo, así que **aún no están en el repo** (las 4 primeras ya se recibieron como foto-06 a foto-09): círculo de pie con el facilitador; almuerzo con el banner "Explora. Siente. Despierta"; facilitador explicando con un lienzo en primer plano; participantes sentadas con el lienzo; mujer caminando hacia el banner (x2); mesa con el banner; participantes levantando la mano.
+Se vieron en el chat pero no llegaron como archivo, así que **aún no están en el repo** (las demás ya se recibieron como foto-06 a foto-14): mujer caminando hacia el banner (x2); mesa con el banner; participantes levantando la mano.
 
 Datos de marca vistos en el banner: "QOLECT · Colección de experiencias · Explora. Siente. Despierta" · "Todo lo que necesitas, en un solo lugar" · "Beneficios exclusivos por ser Qolect" · "Tu próxima aventura comienza aquí".
 
